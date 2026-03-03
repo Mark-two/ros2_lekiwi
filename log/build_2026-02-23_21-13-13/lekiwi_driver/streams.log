@@ -1,0 +1,19 @@
+[1.925s] Invoking command in '/home/kang/Documents/lekiwi_driver/build/lekiwi_driver': PS1=(lerobot) \[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ PYTHONPATH=/home/kang/Documents/lekiwi_driver/build/lekiwi_driver/prefix_override:/home/kang/Documents/lerobot/.venv/lib/python3.10/site-packages/colcon_core/task/python/colcon_distutils_commands:/home/kang/Documents/lekiwi_driver/install/lekiwi_driver/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/kang/Documents/lekiwi_driver/build/lekiwi_driver/build --no-deps symlink_data
+[2.257s] /home/kang/Documents/lerobot/.venv/lib/python3.10/site-packages/setuptools/_distutils/dist.py:289: UserWarning: Unknown distribution option: 'tests_require'
+[2.257s]   warnings.warn(msg)
+[2.635s] running develop
+[3.127s] running egg_info
+[3.162s] writing lekiwi_driver.egg-info/PKG-INFO
+[3.163s] writing dependency_links to lekiwi_driver.egg-info/dependency_links.txt
+[3.164s] writing entry points to lekiwi_driver.egg-info/entry_points.txt
+[3.164s] writing requirements to lekiwi_driver.egg-info/requires.txt
+[3.164s] writing top-level names to lekiwi_driver.egg-info/top_level.txt
+[3.240s] reading manifest file 'lekiwi_driver.egg-info/SOURCES.txt'
+[3.242s] writing manifest file 'lekiwi_driver.egg-info/SOURCES.txt'
+[3.281s] running build_ext
+[3.282s] Creating /home/kang/Documents/lekiwi_driver/install/lekiwi_driver/lib/python3.10/site-packages/lekiwi-driver.egg-link (link to .)
+[3.284s] Installing base_driver script to /home/kang/Documents/lekiwi_driver/install/lekiwi_driver/lib/lekiwi_driver
+[3.284s] 
+[3.285s] Installed /home/kang/Documents/lekiwi_driver/build/lekiwi_driver
+[3.285s] running symlink_data
+[3.380s] Invoked command in '/home/kang/Documents/lekiwi_driver/build/lekiwi_driver' returned '0': PS1=(lerobot) \[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ PYTHONPATH=/home/kang/Documents/lekiwi_driver/build/lekiwi_driver/prefix_override:/home/kang/Documents/lerobot/.venv/lib/python3.10/site-packages/colcon_core/task/python/colcon_distutils_commands:/home/kang/Documents/lekiwi_driver/install/lekiwi_driver/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/kang/Documents/lekiwi_driver/build/lekiwi_driver/build --no-deps symlink_data

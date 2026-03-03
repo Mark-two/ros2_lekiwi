@@ -1,0 +1,2 @@
+[console_scripts]
+base_driver = lekiwi_driver.driver_node:main

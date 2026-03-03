@@ -1,0 +1,17 @@
+/home/kang/Documents/lerobot/.venv/lib/python3.10/site-packages/setuptools/_distutils/dist.py:289: UserWarning: Unknown distribution option: 'tests_require'
+  warnings.warn(msg)
+running develop
+running egg_info
+writing lekiwi_driver.egg-info/PKG-INFO
+writing dependency_links to lekiwi_driver.egg-info/dependency_links.txt
+writing entry points to lekiwi_driver.egg-info/entry_points.txt
+writing requirements to lekiwi_driver.egg-info/requires.txt
+writing top-level names to lekiwi_driver.egg-info/top_level.txt
+reading manifest file 'lekiwi_driver.egg-info/SOURCES.txt'
+writing manifest file 'lekiwi_driver.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/kang/Documents/lekiwi_driver/install/lekiwi_driver/lib/python3.10/site-packages/lekiwi-driver.egg-link (link to .)
+Installing base_driver script to /home/kang/Documents/lekiwi_driver/install/lekiwi_driver/lib/lekiwi_driver
+
+Installed /home/kang/Documents/lekiwi_driver/build/lekiwi_driver
+running symlink_data
