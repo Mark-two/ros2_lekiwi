@@ -1,13 +1,12 @@
-Metadata-Version: 2.4
-Name: lekiwi_driver
+Metadata-Version: 2.1
+Name: lekiwi-driver
 Version: 0.0.0
 Summary: TODO: Package description
+Home-page: UNKNOWN
 Maintainer: root
 Maintainer-email: root@todo.todo
 License: TODO: License declaration
-Requires-Dist: setuptools
-Dynamic: license
-Dynamic: maintainer
-Dynamic: maintainer-email
-Dynamic: requires-dist
-Dynamic: summary
+Platform: UNKNOWN
+
+UNKNOWN
+

@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<!-- 定义机器人模型，名称为lekiwi_robot，引入xacro命名空间 -->
+<robot name="lekiwi_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- 引入lekiwi_vision包中的SO-101机械臂URDF模型 -->
+    <xacro:include filename="$(find lekiwi_vision)/urdf/so101_arm.urdf" />
+
+    <!-- 定义底盘基准坐标系link（空link，用作整个模型的参考原点） -->
+    <link name="base_footprint">
+        </link>
+
+    <!-- 定义机械臂与底盘之间的固定关节 -->
+    <joint name="arm_to_base_joint" type="fixed">
+        <!-- 父link为底盘基准坐标系 -->
+        <parent link="base_footprint"/>
+        <!-- 子link为机械臂基座（对应so101_arm.urdf中的base_link） -->
+        <child link="base_link"/>
+        <!-- 机械臂相对底盘的位置偏移：x方向前移0.1m，z方向上移0.05m -->
+        <origin xyz="0.1 0 0.05" rpy="0 0 0"/> 
+    </joint>
+
+    <!-- 定义支柱link，用于安装摄像头 -->
+    <link name="pillar_link">
+        <!-- 可视化属性 -->
+        <visual>
+            <!-- 几何形状为长方体，尺寸为0.04m x 0.04m x 0.3m -->
+            <geometry>
+                <box size="0.04 0.04 0.3"/> </geometry>
+            <!-- 材质为黄色 -->
+            <material name="yellow"><color rgba="1 1 0 1"/></material>
+        </visual>
+    </link>
+
+    <!-- 定义支柱与底盘之间的固定关节 -->
+    <joint name="pillar_to_base_joint" type="fixed">
+        <!-- 父link为底盘基准坐标系 -->
+        <parent link="base_footprint"/>
+        <!-- 子link为支柱 -->
+        <child link="pillar_link"/>
+        <!-- 支柱相对底盘的位置偏移：x方向后移0.1m，z方向上移0.15m（支柱中心高度） -->
+        <origin xyz="-0.1 0 0.15" rpy="0 0 0"/> 
+    </joint>
+
+    <!-- 定义摄像头link（空link，用作摄像头安装点） -->
+    <link name="camera_link">
+        </link>
+
+    <!-- 定义摄像头俯仰关节，类型为旋转关节 -->
+    <joint name="camera_pitch_joint" type="revolute">
+        <!-- 父link为支柱 -->
+        <parent link="pillar_link"/>
+        <!-- 子link为摄像头 -->
+        <child link="camera_link"/>
+        <!-- 摄像头相对支柱顶部的位置偏移：x方向前移0.02m，z方向上移0.15m -->
+        <origin xyz="0.02 0 0.15" rpy="0 0 0"/>
+        <!-- 旋转轴为Y轴（实现俯仰运动） -->
+        <axis xyz="0 1 0"/>
+        <!-- 关节限制：角度范围±0.785弧度（±45°），最大力矩10Nm，最大速度1rad/s -->
+        <limit lower="-0.785" upper="0.785" effort="10" velocity="1"/>
+    </joint>
+
+    <!-- 定义摄像头光学坐标系link（用于图像处理的坐标转换） -->
+    <link name="camera_color_optical_frame"/>
+    <!-- 定义摄像头光学坐标系与摄像头之间的固定关节 -->
+    <joint name="camera_optical_joint" type="fixed">
+        <!-- 父link为摄像头 -->
+        <parent link="camera_link"/>
+        <!-- 子link为光学坐标系 -->
+        <child link="camera_color_optical_frame"/>
+        <!-- 坐标变换：绕X轴旋转-90°，绕Z轴旋转-90°，将ROS坐标系转换为光学坐标系 -->
+        <origin xyz="0 0 0" rpy="-1.5708 0 -1.5708"/>
+    </joint>
+
+</robot>

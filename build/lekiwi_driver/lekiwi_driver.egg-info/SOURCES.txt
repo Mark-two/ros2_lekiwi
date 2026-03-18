@@ -1,8 +1,17 @@
 package.xml
 setup.cfg
 setup.py
+../../build/lekiwi_driver/lekiwi_driver.egg-info/PKG-INFO
+../../build/lekiwi_driver/lekiwi_driver.egg-info/SOURCES.txt
+../../build/lekiwi_driver/lekiwi_driver.egg-info/dependency_links.txt
+../../build/lekiwi_driver/lekiwi_driver.egg-info/entry_points.txt
+../../build/lekiwi_driver/lekiwi_driver.egg-info/requires.txt
+../../build/lekiwi_driver/lekiwi_driver.egg-info/top_level.txt
+../../build/lekiwi_driver/lekiwi_driver.egg-info/zip-safe
 lekiwi_driver/__init__.py
 lekiwi_driver/driver_node.py
+lekiwi_driver/lekiwi_arm_driver.py
+lekiwi_driver/lekiwi_base_driver.py
 lekiwi_driver.egg-info/PKG-INFO
 lekiwi_driver.egg-info/SOURCES.txt
 lekiwi_driver.egg-info/dependency_links.txt

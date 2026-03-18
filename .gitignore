@@ -1,0 +1,56 @@
+# ROS 2 build artifacts
+build/
+install/
+log/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+*.egg
+dist/
+*.whl
+.eggs/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated
+.DS_Store
+Thumbs.db
+
+# Model files
+*.onnx
+*.engine
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+
+# Logs
+*.log
+
+# Compiled shared libraries
+*.so
+*.dylib
+
+# C/C++ build
+*.o
+*.a
+*.out
+CMakeCache.txt
+CMakeFiles/
+
+# Bag files
+*.bag
+*.db3

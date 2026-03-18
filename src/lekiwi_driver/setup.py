@@ -21,6 +21,8 @@ setup(  # 配置并声明当前 Python/ROS2 包信息
     entry_points={  # 定义可执行入口点
         'console_scripts': [  # 命令行脚本列表
             'base_driver = lekiwi_driver.driver_node:main',  # 注册 base_driver 命令
+            'lekiwi_base_driver = lekiwi_driver.lekiwi_base_driver:main',  # 底盘驱动节点
+            'lekiwi_arm_driver = lekiwi_driver.lekiwi_arm_driver:main',  # 机械臂驱动节点
         ],
     },
 )  # 结束 setup 配置

@@ -1,0 +1,9 @@
+# 注意缩进，YAML 对空格极其敏感！
+yolo_trt_node:                # ROS2 节点名称，需与launch文件中的节点名一致
+  ros__parameters:            # ROS2 参数声明的固定前缀，不可修改
+    # 这里才是引擎真正的安身之所！
+    engine_path: "/home/kang/Documents/ros2_lekiwi/src/lekiwi_vision/weights/cat_ball_v11.engine"  # TensorRT 推理引擎文件的绝对路径
+    
+    # 顺便为以后的后处理留个后门
+    conf_threshold: 0.6       # 置信度阈值，低于此值的检测结果会被过滤掉
+    nms_threshold: 0.45       # 非极大值抑制(NMS)阈值，用于去除重叠的检测框
