@@ -131,7 +131,7 @@ install(DIRECTORY include/
 #   urdf/    : 机器人描述文件（.urdf / .xacro 等）
 #   meshes/  : 机械臂3D网格模型文件（.stl）
 #   安装到 install/lekiwi_vision/share/lekiwi_vision/ 下
-install(DIRECTORY launch config weights urdf meshes
+install(DIRECTORY launch config weights urdf meshes rviz
   DESTINATION share/${PROJECT_NAME}
 )
 

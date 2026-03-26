@@ -1,44 +1,66 @@
+import os
 from launch import LaunchDescription
 from launch_ros.actions import Node
 
 def generate_launch_description():
-    # 1. 静态 TF：把相机的原点强行钉在小车正前方
-    tf_node = Node(
-        package='tf2_ros',
-        executable='static_transform_publisher',
-        arguments=['0.1', '0.0', '0.15', '0.0', '0.0', '0.0', 'base_link', 'camera_link'],
+    # ==========================================================
+    # 1. 定义绝对路径 (完全契合亢哥的真实物理路径)
+    # ==========================================================
+    urdf_path = '/home/kang/Documents/ros2_lekiwi/src/lekiwi_vision/urdf/so101_arm.urdf'
+    rviz_path = '/home/kang/Documents/ros2_lekiwi/lekiwi.rviz'
+
+    # 💥 极客级优化：直接在内存里把 URDF 读成纯文本字符串。
+    with open(urdf_path, 'r') as infp:
+        robot_desc = infp.read()
+
+    # ==========================================================
+    # 2. 编排系统节点 (五虎上将齐聚)
+    # ==========================================================
+    
+    # 🦴 骨架引擎
+    rsp_node = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        output='screen',
+        parameters=[{'robot_description': robot_desc}]
+    )
+
+    # 👁️ RViz2 监控终端
+    rviz_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        output='screen',
+        arguments=['-d', rviz_path]
+    )
+
+    # 🦾 真实机械臂底层驱动
+    driver_node = Node(
+        package='lekiwi_driver',
+        executable='lekiwi_arm_driver',
         output='screen'
     )
 
-    # 2. 相机硬件层：只管吐彩色图和深度图，绝对不准算点云！
-    camera_node = Node(
-        package='realsense2_camera',
-        executable='realsense2_camera_node',
-        name='camera',
-        namespace='camera',
-        output='screen',
-        parameters=[{
-            'align_depth.enable': True,
-            'pointcloud.enable': False,   # 🔪 彻底关闭那个会崩溃的原厂滤镜！
-            'rgb_camera.profile': '640x480x30',
-            'depth_module.profile': '640x480x30',
-            'rgb_camera.power_line_frequency': 2
-        }]
+    # 🧠 Pink 逆解大脑
+    brain_node = Node(
+        package='lekiwi_driver',
+        executable='lekiwi_brain_node',
+        output='screen'
     )
 
-    # 3. 最强外挂：接手彩色和深度图，高帧率输出全彩点云！
-    pc_node = Node(
-        package='depth_image_proc',
-        executable='point_cloud_xyzrgb_node',
-        name='point_cloud_xyzrgb_node',
-        namespace='camera',
-        output='screen',
-        remappings=[
-            ('rgb/camera_info', '/camera/color/camera_info'),
-            ('rgb/image_rect_color', '/camera/color/image_raw'),
-            ('depth_registered/image_rect', '/camera/aligned_depth_to_color/image_raw'),
-            ('points', '/camera/depth/color/points') # 完美伪装成原厂话题名
-        ]
+    # 👀 YOLO TensorRT 视觉推理节点 (亢哥点名的王牌)
+    yolo_node = Node(
+        package='lekiwi_vision',
+        executable='yolo_trt_node',
+        output='screen'
     )
 
-    return LaunchDescription([tf_node, camera_node, pc_node])
+    # ==========================================================
+    # 3. 组装并交由 ROS 2 引擎一键拉起
+    # ==========================================================
+    return LaunchDescription([
+        rsp_node,
+        driver_node,  # 先拉底层物理驱动
+        yolo_node,    # 拉起视觉雷达！开始疯狂扫描目标
+        brain_node,   # 拉起大脑！大脑现在可以直接接收 YOLO 的目标了
+        rviz_node     # 最后拉 RViz2 渲染画面
+    ])

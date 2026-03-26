@@ -110,7 +110,9 @@ function colcon_package_source_powershell_script {
 # the prefix is two levels up from the package specific share directory
 $env:COLCON_CURRENT_PREFIX=(Get-Item $PSCommandPath).Directory.Parent.Parent.FullName
 
+colcon_package_source_powershell_script "$env:COLCON_CURRENT_PREFIX\share/lekiwi_driver/hook/path.ps1"
 colcon_package_source_powershell_script "$env:COLCON_CURRENT_PREFIX\share/lekiwi_driver/hook/pythonpath.ps1"
+colcon_package_source_powershell_script "$env:COLCON_CURRENT_PREFIX\share/lekiwi_driver/hook/pythonscriptspath.ps1"
 colcon_package_source_powershell_script "$env:COLCON_CURRENT_PREFIX\share/lekiwi_driver/hook/ament_prefix_path.ps1"
 colcon_package_source_powershell_script "$env:COLCON_CURRENT_PREFIX\../../build/lekiwi_driver/share/lekiwi_driver/hook/pythonpath_develop.ps1"
 

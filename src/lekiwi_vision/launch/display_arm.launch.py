@@ -7,27 +7,22 @@ from launch.substitutions import Command
 
 def generate_launch_description():
     pkg_share = get_package_share_directory('lekiwi_vision')
-    urdf_file = os.path.join(pkg_share, 'urdf', 'lekiwi_robot.urdf.xacro')
+    urdf_file = os.path.join(pkg_share, 'urdf', 'so101_arm.urdf')
 
-    # 大管家 1：解析 xacro 模型并广播给全系统
+    # 解析 URDF 并发布静态 TF
     robot_state_publisher_node = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
-        parameters=[{'robot_description': ParameterValue(Command(['xacro ', urdf_file]), value_type=str)}]
+        parameters=[{'robot_description': ParameterValue(Command(['cat ', urdf_file]), value_type=str)}]
     )
 
-    # 大管家 2：合并发布的真实关节状态和缺失关节（如云台等）的 0 度状态
+    # 默认给所有活动关节发布 0 度的假数据
     joint_state_publisher_node = Node(
         package='joint_state_publisher',
-        executable='joint_state_publisher',
-        parameters=[
-            {'robot_description': ParameterValue(Command(['xacro ', urdf_file]), value_type=str)},
-            {'source_list': ['/lekiwi/arm_joint_states']}
-        ]
+        executable='joint_state_publisher'
     )
 
-    # Foxglove Bridge：让 Foxglove Studio 能通过 WebSocket 连接 ROS2，
-    # 并开启 asset 服务，使 Foxglove 能获取 package:// 路径下的 STL 网格文件
+    # 启动 Foxglove
     foxglove_bridge_node = Node(
         package='foxglove_bridge',
         executable='foxglove_bridge',
