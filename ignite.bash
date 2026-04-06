@@ -12,4 +12,4 @@ source ~/Documents/ros2_lekiwi/install/setup.bash
 # 2. 终极点火
 echo "🚀 引擎点火！全系统节点拉起！(按 Ctrl+C 即可完美退出)"
 echo "=================================================="
-ros2 launch ~/Documents/ros2_lekiwi/lekiwi_bringup.launch.py
+ros2 launch /home/kang/Documents/ros2_lekiwi/lekiwi_bring_up.launch.py

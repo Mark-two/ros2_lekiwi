@@ -20,7 +20,7 @@ except ImportError:
     from lerobot.motors.motors_bus import Motor, MotorNormMode
 
 # --- 硬件端口配置 (需结合实际 udev 规则调整) ---
-ARM_PORT = '/dev/ttyACM1'  
+ARM_PORT = '/dev/lekiwi_arm_driver'  
 ARM_IDS = [1, 2, 3, 4, 5, 6] 
 
 class LeKiwiArmDriver(Node):

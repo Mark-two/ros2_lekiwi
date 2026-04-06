@@ -136,14 +136,14 @@
     </inertial>
     <!-- Part sts3215_03a_v1_3 -->
     <visual>
-      <origin xyz="-0.11257 -0.0155 0.0187" rpy="-3.14159 -5.27356e-16 -1.5708"/>
+      <origin xyz="-0.11257 -0.0155 0.0187" rpy="-3.14159 -5.27356e-16 -2.0708"/>
       <geometry>
         <mesh filename="package://lekiwi_vision/meshes/sts3215_03a_v1.stl"/>
       </geometry>
       <material name="sts3215"/>
     </visual>
     <collision>
-      <origin xyz="-0.11257 -0.0155 0.0187" rpy="-3.14159 -5.27356e-16 -1.5708"/>
+      <origin xyz="-0.11257 -0.0155 0.0187" rpy="-3.14159 -5.27356e-16 -2.0708"/>
       <geometry>
         <mesh filename="package://lekiwi_vision/meshes/sts3215_03a_v1.stl"/>
       </geometry>
@@ -315,14 +315,14 @@
     </inertial>
     <!-- Part moving_jaw_so101_v1 -->
     <visual>
-      <origin xyz="-5.55112e-17 -5.55112e-17 0.0189" rpy="9.53145e-17 6.93889e-18 1.24077e-24"/>
+      <origin xyz="-5.55112e-17 -5.55112e-17 0.0189" rpy="9.53145e-17 6.93889e-18 -0.4"/>
       <geometry>
         <mesh filename="package://lekiwi_vision/meshes/moving_jaw_so101_v1.stl"/>
       </geometry>
       <material name="3d_printed"/>
     </visual>
     <collision>
-      <origin xyz="-5.55112e-17 -5.55112e-17 0.0189" rpy="9.53145e-17 6.93889e-18 1.24077e-24"/>
+      <origin xyz="-5.55112e-17 -5.55112e-17 0.0189" rpy="9.53145e-17 6.93889e-18 -0.4"/>
       <geometry>
         <mesh filename="package://lekiwi_vision/meshes/moving_jaw_so101_v1.stl"/>
       </geometry>
@@ -392,7 +392,7 @@
   <!-- Joint from upper_arm to lower_arm -->
   <!-- Note: 5-degree calibration offset applied to joint limits -->
   <joint name="elbow_flex" type="revolute">
-    <origin xyz="-0.11257 -0.028 1.73763e-16" rpy="-3.63608e-16 8.74301e-16 1.5708"/>
+    <origin xyz="-0.11257 -0.028 1.73763e-16" rpy="-3.63608e-16 8.74301e-16 1.1708"/>
     <parent link="upper_arm_link"/>
     <child link="lower_arm_link"/>
     <axis xyz="0 0 1"/>

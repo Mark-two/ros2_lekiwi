@@ -112,6 +112,13 @@ target_link_libraries(yolo_trt_node
 # install(TARGETS ...) 安装编译好的可执行文件
 #   DESTINATION lib/${PROJECT_NAME} : 安装到 install/lekiwi_vision/lib/lekiwi_vision/
 #   这样 ros2 run lekiwi_vision yolo_trt_node 才能找到它
+
+# 安装 Python 节点 red_dot_detector.py 到 lib/${PROJECT_NAME}
+install(PROGRAMS
+  src/red_dot_detector.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 install(TARGETS
   yolo_trt_node
   DESTINATION lib/${PROJECT_NAME}

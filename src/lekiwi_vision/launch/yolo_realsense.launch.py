@@ -35,16 +35,18 @@ def generate_launch_description():
         # 传递 launch 参数给 RealSense launch 文件
         launch_arguments={
             # 把 'rgb_camera.profile' 改成 'rgb_camera.color_profile'
-            'rgb_camera.color_profile': '640x480x30',
+            'rgb_camera.color_profile': '640x480x15',
             # 关闭深度相机，找毛球场景暂时用不到深度信息，节省算力
             'enable_depth': 'true',
-            'depth_module.depth_profile': '640x480x30',
+            'depth_module.depth_profile': '640x480x15',
             
             # --- 💥 核心：将深度图的像素严丝合缝地对齐到彩色图上 ---
             'align_depth.enable': 'true',
             # --- 🚀 新增的 Jetson 专属救命参数 ---
             # 1. 启动前强行重置一次相机硬件，清空所有死锁的 USB 寄存器
-            'initial_reset': 'true'   
+            'initial_reset': 'true',
+            # 💥 修正：Humble 版本开启孔洞填充滤镜的正确语法
+            #'hole_filling_filter.enable': 'true'
         }.items()
     )
 

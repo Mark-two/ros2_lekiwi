@@ -2,6 +2,7 @@
 #include <sensor_msgs/msg/image.hpp>                  // ROS2 标准图像消息类型定义
 #include <sensor_msgs/msg/camera_info.hpp>             // ROS2 相机内参消息类型，包含焦距和光心
 #include <cv_bridge/cv_bridge.h>                      // ROS2 图像消息与 OpenCV Mat 之间的桥梁转换库
+#include <geometry_msgs/msg/point_stamped.hpp>         // ROS2 带时间戳的3D坐标点消息
 #include <image_transport/image_transport.hpp>         // ROS2 图像传输插件，支持压缩传输等
 
 // OpenCV 与 CUDA 核心头文件
@@ -33,6 +34,7 @@ public:                                               // 公有成员区域
             std::bind(&YoloTrtNode::image_callback, this, std::placeholders::_1));  // 绑定回调函数，收到图像时自动调用
 
         publisher_ = this->create_publisher<sensor_msgs::msg::Image>("/lekiwi_vision/yolo_image", 10);  // 创建发布器，发布带检测框的图像到指定话题
+        point_publisher_ = this->create_publisher<geometry_msgs::msg::PointStamped>("/lekiwi_vision/target_point", 10);  // 创建3D坐标发布器
 
         // --- 核心动作 2：极其优雅地读取外部 YAML 参数 ---
         // 1. 必须先"声明"参数，并给个兜底的默认值，防止没传 yaml 时程序直接崩溃
@@ -84,6 +86,7 @@ private:                                              // 私有成员区域
     // ROS 2 核心通信组件
     rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr subscription_;  // 图像订阅器智能指针，管理订阅生命周期
     rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr publisher_;        // 图像发布器智能指针，管理发布生命周期
+    rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr point_publisher_;  // 3D坐标发布器
 
     rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr depth_sub_;
     rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr cam_info_sub_;
@@ -178,7 +181,7 @@ private:                                              // 私有成员区域
         // ==========================================
         // 第三斧：后处理 — 解析 YOLO11 输出 + NMS
         // ==========================================
-        const float CONF_THRESHOLD = 0.6f;            // 置信度阈值，低于此值的检测框直接丢弃
+        const float CONF_THRESHOLD = 0.1f;            // 置信度阈值，低于此值的检测框直接丢弃
         const float NMS_THRESHOLD  = 0.45f;           // NMS IoU 阈值，重叠超过此比例的框只保留最优
         const int NUM_DETECTIONS   = 8400;            // YOLO11 固定输出 8400 个候选框
 
@@ -237,6 +240,13 @@ private:                                              // 私有成员区域
                         snprintf(coord_buf, sizeof(coord_buf), " (%.2f,%.2f,%.2f)m", x3d, y3d, z);
                         label += coord_buf;
                         RCLCPP_INFO(this->get_logger(), "🎯 锁定毛球！3D坐标: (%.3f, %.3f, %.3f) m", x3d, y3d, z);
+
+                        geometry_msgs::msg::PointStamped point_msg;
+                        point_msg.header = msg->header;
+                        point_msg.point.x = x3d;
+                        point_msg.point.y = y3d;
+                        point_msg.point.z = z;
+                        point_publisher_->publish(point_msg);
                     } else {
                         label += " " + std::to_string(depth_mm) + "mm";
                         RCLCPP_INFO(this->get_logger(), "🎯 锁定毛球！像素坐标: (%d, %d), 距离: %d mm", 

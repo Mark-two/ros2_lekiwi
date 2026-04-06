@@ -30,7 +30,7 @@ ROBOT_RADIUS = 0.15
 K_SPEED = 13038
 
 # --- 硬件端口配置 (需结合实际 udev 规则调整) ---
-BASE_PORT = '/dev/ttyACM0' 
+BASE_PORT = '/dev/lekiwi_base_driver' 
 BASE_WHEEL_IDS = [1, 2, 3] # 轮子 ID
 BASE_CAM_ID = 4            # 相机 ID
 
@@ -41,7 +41,7 @@ class LeKiwiBaseDriver(Node):
         # 1. ROS 通讯接口
         # 订阅 cmd_vel，发布 odom 和 joint_states，广播 TF
         self.sub_cmd = self.create_subscription(Twist, 'cmd_vel', self.cmd_vel_callback, 10)
-        self.sub_cam = self.create_subscription(Float64, 'camera_cmd', self.camera_cmd_callback, 10)
+        self.sub_cam = self.create_subscription(JointState, '/lekiwi/joint_commands', self.camera_cmd_callback, 10)
         self.pub_odom = self.create_publisher(Odometry, 'odom', 10)
         self.pub_joint_states = self.create_publisher(JointState, 'joint_states', 10)
         self.tf_broadcaster = TransformBroadcaster(self)
@@ -109,13 +109,37 @@ class LeKiwiBaseDriver(Node):
         self.target_vth = msg.angular.z
 
     def camera_cmd_callback(self, msg):
-        """接收相机目标位置 (raw ticks)，做软限位 clamp 后保存"""
-        raw = int(msg.data)
-        clamped = max(self.cam_min, min(self.cam_max, raw))
-        if raw != clamped:
-            self.get_logger().warn(
-                f'相机指令 {raw} 超出限位 [{self.cam_min}, {self.cam_max}]，已钳位到 {clamped}')
-        self.cam_target = clamped
+        """接收标准 JointState 目标位置 (弧度)，转换为底层 raw ticks 并做软限位"""      
+        # 遍历发来的关节数组，精准狙击相机云台的指令
+        for i, joint_name in enumerate(msg.name):
+            if joint_name == 'camera_pitch_joint':  # 💥 确保这里和你的 URDF 里的关节名字一模一样
+                
+                target_rad = msg.position[i]
+                
+                # --- 物理校准参数 (建议在 __init__ 里统一定义，这里直接写也行) ---
+                center_offset = 2048  # 水平视角的舵机中心读数
+                direction = 1        # 舵机安装的正反向 (-1 或 1)
+                # -------------------------------------------------------------
+                
+                # 1. 核心数学：弧度 -> 舵机真实刻度
+                raw = int((target_rad * direction * 2048.0 / math.pi) + center_offset)
+                
+                # 2. 工业级钳位保护 (软限位)
+                clamped = max(self.cam_min, min(self.cam_max, raw))
+                
+                if raw != clamped:
+                    self.get_logger().warn(
+                        f'📷 相机指令 {target_rad:.3f} rad (换算值:{raw}) '
+                        f'超出限位 [{self.cam_min}, {self.cam_max}]，已强制钳位到 {clamped} !'
+                    )
+                else:
+                    self.get_logger().debug(f'📷 相机指令解析成功: {target_rad:.3f} rad -> {clamped} ticks')
+
+                # 3. 保存目标值，交给底层的串口发送线程去执行
+                self.cam_target = clamped
+                
+                # 既然找到了相机指令，直接退出循环，节省算力
+                break
 
     def control_loop(self):
         vx, vy, vth = self.target_vx, self.target_vy, self.target_vth

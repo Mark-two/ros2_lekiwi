@@ -1,23 +1,49 @@
 import os
+from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch_ros.actions import Node
+from launch.substitutions import Command
+from launch_ros.parameter_descriptions import ParameterValue
+from launch.actions import IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 def generate_launch_description():
-    # ==========================================================
-    # 1. 定义绝对路径 (完全契合亢哥的真实物理路径)
-    # ==========================================================
-    urdf_path = '/home/kang/Documents/ros2_lekiwi/src/lekiwi_vision/urdf/so101_arm.urdf'
+    # ==========================================
+    # 🗺️ 核心路径配置
+    # ==========================================
+    urdf_path = '/home/kang/Documents/ros2_lekiwi/src/lekiwi_vision/urdf/lekiwi_robot.urdf.xacro' 
     rviz_path = '/home/kang/Documents/ros2_lekiwi/lekiwi.rviz'
-
-    # 💥 极客级优化：直接在内存里把 URDF 读成纯文本字符串。
-    with open(urdf_path, 'r') as infp:
-        robot_desc = infp.read()
-
-    # ==========================================================
-    # 2. 编排系统节点 (五虎上将齐聚)
-    # ==========================================================
     
-    # 🦴 骨架引擎
+    # 💥 新增：获取 YOLO 参数配置文件路径（救命稻草）
+    lekiwi_vision_dir = get_package_share_directory('lekiwi_vision')
+    yolo_params_file = os.path.join(lekiwi_vision_dir, 'config', 'yolo_params.yaml')
+
+    # Xacro 引擎解析
+    robot_desc = ParameterValue(Command(['xacro ', urdf_path]), value_type=str)
+
+    # ==========================================
+    # 📷 唤醒 RealSense 真实相机之眼
+    # ==========================================
+    realsense_dir = get_package_share_directory('realsense2_camera')
+    realsense_launch_file = os.path.join(realsense_dir, 'launch', 'rs_launch.py')
+
+    start_camera_cmd = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(realsense_launch_file),
+        launch_arguments={
+            'rgb_camera.color_profile': '640x480x15',
+            'enable_depth': 'true',
+            'depth_module.depth_profile': '640x480x15',
+            'align_depth.enable': 'true',
+            'initial_reset': 'true',
+            # 💥 彻底封杀无关传感器，保底 USB 带宽
+            'enable_infra1': 'false',
+            'enable_infra2': 'false',
+            'enable_gyro': 'false',
+            'enable_accel': 'false'
+        }.items()
+    )
+
+    # 1. 骨架引擎
     rsp_node = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
@@ -25,7 +51,7 @@ def generate_launch_description():
         parameters=[{'robot_description': robot_desc}]
     )
 
-    # 👁️ RViz2 监控终端
+    # 2. RViz2 (⚠️注意：如果没有连接物理显示器，请注释掉这行，否则会报 Exit Code -6)
     rviz_node = Node(
         package='rviz2',
         executable='rviz2',
@@ -33,34 +59,51 @@ def generate_launch_description():
         arguments=['-d', rviz_path]
     )
 
-    # 🦾 真实机械臂底层驱动
-    driver_node = Node(
+    # 3. 🦾 机械臂硬件驱动 (ttyACM1)
+    arm_driver_node = Node(
         package='lekiwi_driver',
         executable='lekiwi_arm_driver',
         output='screen'
     )
 
-    # 🧠 Pink 逆解大脑
+    # 4. 🛞 底盘与云台硬件驱动 (ttyACM0)
+    base_driver_node = Node(
+        package='lekiwi_driver',
+        executable='lekiwi_base_driver',
+        output='screen'
+    )
+
+    # 5. 👀 YOLO 视觉节点 (💥 完美修复：注入了 yaml 参数文件)
+    yolo_node = Node(
+        package='lekiwi_vision',
+        executable='yolo_trt_node',
+        name='yolo_trt_node',
+        output='screen',
+        parameters=[yolo_params_file] # <--- 引擎绝对不会再迷路了！
+    )
+
+    # 6. 🧠 大脑节点
     brain_node = Node(
         package='lekiwi_driver',
         executable='lekiwi_brain_node',
         output='screen'
     )
 
-    # 👀 YOLO TensorRT 视觉推理节点 (亢哥点名的王牌)
-    yolo_node = Node(
-        package='lekiwi_vision',
-        executable='yolo_trt_node',
+    # 🎛️ 关节滑块面板 (⚠️注意：如果没有连接物理显示器，请注释掉这行)
+    jsp_gui_node = Node(
+        package='joint_state_publisher_gui',
+        executable='joint_state_publisher_gui',
         output='screen'
     )
 
-    # ==========================================================
-    # 3. 组装并交由 ROS 2 引擎一键拉起
-    # ==========================================================
+    # 🚀 一键发射清单
     return LaunchDescription([
         rsp_node,
-        driver_node,  # 先拉底层物理驱动
-        yolo_node,    # 拉起视觉雷达！开始疯狂扫描目标
-        brain_node,   # 拉起大脑！大脑现在可以直接接收 YOLO 的目标了
-        rviz_node     # 最后拉 RViz2 渲染画面
+        start_camera_cmd, # 先拉起相机硬件
+        base_driver_node, # 拉底盘
+        arm_driver_node,  # 拉机械臂
+        yolo_node,        # YOLO 挂载参数启动！
+        #jsp_gui_node,
+        #rviz_node,
+        brain_node
     ])
